@@ -43,7 +43,11 @@ export function Navbar({ onNavigate, activePath = '/' }: NavbarProps) {
   const handleLogout = () => {
     localStorage.removeItem('itpath_logged_in_user');
     setUser(null);
-    window.location.reload();
+    if (onNavigate) {
+      onNavigate('/');
+    } else {
+      window.location.reload();
+    }
   };
 
   return (

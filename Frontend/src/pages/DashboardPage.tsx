@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Logo } from '../components/common/Logo';
+import { useAuth } from '../hooks/useAuth';
 
 interface DashboardPageProps {
   onNavigate: (path: string) => void;
@@ -9,10 +10,11 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'academic' | 'roadmap' | 'balance' | 'portfolio' | 'resources'>('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAccountMenu, setShowAccountMenu] = useState(false);
+  const { user: authUser, logout } = useAuth();
 
-  // Mock User Data
+  // Mock User Data combined with auth state
   const user = {
-    name: 'Nuha',
+    name: authUser?.fullName || 'Student',
     degree: 'BSc Computer Science & Technology',
     year: '3rd Year',
     university: 'Uva Wellassa University',
@@ -22,8 +24,8 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
     portfolioStrength: 35
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('itpath_logged_in_user');
+  const handleLogout = async () => {
+    await logout();
     onNavigate('/');
   };
 

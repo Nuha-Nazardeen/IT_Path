@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { authService } from '../services/authService';
 
 interface RegisterPageProps {
   onNavigate: (path: string) => void;
@@ -30,13 +31,30 @@ const DEGREES = [
 
 const CAREER_PREVIEWS: Record<string, string[]> = {
   'Software Engineer': ['Fundamentals', 'Data Structures', 'Backend Systems'],
-  'QA Engineer': ['Testing Basics', 'API Testing', 'Automation'],
-  'Data Analyst': ['SQL & Excel', 'Analytics & BI', 'Data Visualization'],
+  'Backend Developer': ['APIs & Express', 'Databases & Mongoose', 'Authentication & Security'],
+  'UI/UX Designer': ['User Research', 'Wireframing & Figma', 'Prototyping & Testing'],
+  'DevOps Engineer': ['CI/CD Pipelines', 'Docker & Kubernetes', 'Cloud & Infrastructure'],
+  'Cyber Security': ['Network Security', 'Penetration Testing', 'Identity Management'],
+  'Machine Learning': ['Python & Math', 'Supervised Learning', 'Neural Networks'],
+  'Data Science': ['Python & Pandas', 'Statistical Analysis', 'Data Visualization'],
+  'Product Manager': ['Agile & Scrum', 'Project Scheduling', 'Stakeholder Mgmt'],
+  'QA / Software Tester': ['Manual Testing', 'Automation Testing', 'Performance Testing'],
 };
 
 export function RegisterPage({ onNavigate }: RegisterPageProps) {
   // Step manager: 1 (Account), 2 (Academic), 3 (Career), 4 (Skills), 5 (Review), 6 (Success)
   const [step, setStep] = useState(1);
+  const step3CarouselRef = useRef<HTMLDivElement>(null);
+
+  const scrollStep3 = (direction: 'left' | 'right') => {
+    if (step3CarouselRef.current) {
+      const scrollAmount = 300;
+      step3CarouselRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   // Form Fields State
   const [fullName, setFullName] = useState('');
@@ -118,10 +136,11 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
     setStep(prev => Math.max(1, prev - 1));
   };
 
-  const handleCreateProfile = () => {
+  const handleCreateProfile = async () => {
     const studentProfile = {
       fullName,
       uniEmail,
+      password,
       academic: {
         university: university === 'Other' ? otherUniversity : university,
         degree: degree === 'Other' ? otherDegree : degree,
@@ -140,12 +159,17 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
       }
     };
 
-    localStorage.setItem('itpath_registered_user', JSON.stringify(studentProfile));
-    setStep(6);
+    try {
+      await authService.register(studentProfile);
+      setStep(6);
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      alert(error.message || 'Failed to connect to backend server. Please verify backend is running.');
+    }
   };
 
   const handleFinish = () => {
-    onNavigate('/');
+    onNavigate('/login');
   };
 
   const handleToggleSkill = (skill: string) => {
@@ -298,19 +322,19 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
       {/* Horizontal mini progress */}
       <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '40px', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>
         <span style={{ color: 'var(--brand-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ background: 'var(--brand-primary)', color: 'white', width: '20px', height: '20px', borderRadius: '50%', display: 'inlineFlex', alignItems: 'center', justifyContent: 'center', fontSize: '11px' }}>1</span> Account
+          <span style={{ background: 'var(--brand-primary)', color: 'white', width: '20px', height: '20px', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px' }}>1</span> Account
         </span>
         <span style={{ color: 'var(--text-muted)' }}>→</span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ border: '1px solid var(--text-muted)', color: 'var(--text-muted)', width: '20px', height: '20px', borderRadius: '50%', display: 'inlineFlex', alignItems: 'center', justifyContent: 'center', fontSize: '11px' }}>2</span> Academic
+          <span style={{ border: '1px solid var(--text-muted)', color: 'var(--text-muted)', width: '20px', height: '20px', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px' }}>2</span> Academic
         </span>
         <span style={{ color: 'var(--text-muted)' }}>→</span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ border: '1px solid var(--text-muted)', color: 'var(--text-muted)', width: '20px', height: '20px', borderRadius: '50%', display: 'inlineFlex', alignItems: 'center', justifyContent: 'center', fontSize: '11px' }}>3</span> Career
+          <span style={{ border: '1px solid var(--text-muted)', color: 'var(--text-muted)', width: '20px', height: '20px', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px' }}>3</span> Career
         </span>
         <span style={{ color: 'var(--text-muted)' }}>→</span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ border: '1px solid var(--text-muted)', color: 'var(--text-muted)', width: '20px', height: '20px', borderRadius: '50%', display: 'inlineFlex', alignItems: 'center', justifyContent: 'center', fontSize: '11px' }}>4</span> Finish
+          <span style={{ border: '1px solid var(--text-muted)', color: 'var(--text-muted)', width: '20px', height: '20px', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px' }}>4</span> Finish
         </span>
       </div>
 
@@ -622,19 +646,44 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
         icon: '💻'
       },
       {
-        title: 'QA Engineer',
-        desc: 'Ensure software quality through automated and manual testing.',
+        title: 'Backend Developer',
+        desc: 'Design server-side logic, databases, and APIs.',
+        icon: '⚙️'
+      },
+      {
+        title: 'UI/UX Designer',
+        desc: 'Create interfaces and optimize user experiences.',
+        icon: '🎨'
+      },
+      {
+        title: 'DevOps Engineer',
+        desc: 'Automate deployments, handle CI/CD, and manage cloud infrastructure.',
+        icon: '🚀'
+      },
+      {
+        title: 'Cyber Security',
+        desc: 'Protect systems, networks, and databases from threats.',
+        icon: '🛡️'
+      },
+      {
+        title: 'Machine Learning',
+        desc: 'Build predictive models and neural network algorithms.',
+        icon: '🧠'
+      },
+      {
+        title: 'Data Science',
+        desc: 'Analyze complex data patterns and extract business insights.',
+        icon: '📊'
+      },
+      {
+        title: 'Product Manager',
+        desc: 'Coordinate development teams and manage software products.',
+        icon: '💼'
+      },
+      {
+        title: 'QA / Software Tester',
+        desc: 'Test applications to ensure top quality standards.',
         icon: '🐞'
-      },
-      {
-        title: 'Data Analyst',
-        desc: 'Transform complex data into actionable business insights.',
-        icon: '📈'
-      },
-      {
-        title: 'Still Exploring',
-        desc: 'Not sure yet? Start with our general foundation path.',
-        icon: '🧭'
       }
     ];
 
@@ -647,62 +696,98 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
           Select a career path to preview your personalized learning roadmap. You can always adjust this later.
         </p>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '16px',
-          marginBottom: '40px'
-        }}>
-          {roles.map(r => {
-            const isSelected = careerDirection === r.title;
-            return (
-              <div
-                key={r.title}
-                onClick={() => setCareerDirection(r.title)}
-                style={{
-                  backgroundColor: isSelected ? '#FCFAF7' : 'white',
-                  border: isSelected ? '1px solid var(--brand-primary)' : '1px solid var(--border-cream)',
-                  borderRadius: '12px',
-                  padding: '20px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  position: 'relative',
-                  boxShadow: isSelected ? 'var(--shadow-md)' : 'var(--shadow-sm)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  minHeight: '280px'
-                }}
-              >
-                {isSelected && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '16px',
-                    right: '16px',
-                    color: 'var(--brand-primary)',
-                    fontSize: '16px',
-                    fontWeight: 'bold'
-                  }}>✓</div>
-                )}
-                <div>
-                  <div style={{
-                    backgroundColor: isSelected ? 'var(--accent-cream)' : '#FAF6F0',
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '18px',
-                    marginBottom: '14px'
-                  }}>{r.icon}</div>
-                  <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--brand-primary)', marginBottom: '8px' }}>{r.title}</h3>
-                  <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{r.desc}</p>
-                </div>
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', marginBottom: '40px', padding: '0 40px' }}>
+          {/* Left Arrow Button */}
+          <button
+            type="button"
+            onClick={() => scrollStep3('left')}
+            style={{
+              position: 'absolute',
+              left: '0px',
+              zIndex: 10,
+              background: 'white',
+              border: '1px solid var(--border-cream)',
+              borderRadius: '50%',
+              width: '36px',
+              height: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              boxShadow: 'var(--shadow-sm)',
+              color: 'var(--brand-primary)',
+              fontWeight: 'bold',
+              fontSize: '18px'
+            }}
+          >
+            ←
+          </button>
 
-                <div style={{ marginTop: '20px', borderTop: '1px solid var(--border-cream)', paddingTop: '12px' }}>
-                  <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>Preview Roadmap</div>
-                  {r.title !== 'Still Exploring' ? (
+          {/* Scrollable Container */}
+          <div
+            ref={step3CarouselRef}
+            style={{
+              display: 'flex',
+              gap: '16px',
+              overflowX: 'auto',
+              scrollBehavior: 'smooth',
+              padding: '10px 4px',
+              width: '100%',
+              scrollbarWidth: 'none', // hide for Firefox
+              msOverflowStyle: 'none'  // hide for IE
+            }}
+            className="step3-carousel"
+          >
+            {roles.map(r => {
+              const isSelected = careerDirection === r.title;
+              return (
+                <div
+                  key={r.title}
+                  onClick={() => setCareerDirection(r.title)}
+                  style={{
+                    flex: '0 0 240px',
+                    backgroundColor: isSelected ? '#FCFAF7' : 'white',
+                    border: isSelected ? '1px solid var(--brand-primary)' : '1px solid var(--border-cream)',
+                    borderRadius: '12px',
+                    padding: '20px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    position: 'relative',
+                    boxShadow: isSelected ? 'var(--shadow-md)' : 'var(--shadow-sm)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    minHeight: '280px'
+                  }}
+                >
+                  {isSelected && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '16px',
+                      right: '16px',
+                      color: 'var(--brand-primary)',
+                      fontSize: '16px',
+                      fontWeight: 'bold'
+                    }}>✓</div>
+                  )}
+                  <div>
+                    <div style={{
+                      backgroundColor: isSelected ? 'var(--accent-cream)' : '#FAF6F0',
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '18px',
+                      marginBottom: '14px'
+                    }}>{r.icon}</div>
+                    <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--brand-primary)', marginBottom: '8px' }}>{r.title}</h3>
+                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{r.desc}</p>
+                  </div>
+
+                  <div style={{ marginTop: '20px', borderTop: '1px solid var(--border-cream)', paddingTop: '12px' }}>
+                    <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>Preview Roadmap</div>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       {CAREER_PREVIEWS[r.title]?.map(skill => (
                         <li key={skill} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--text-primary)', fontWeight: 600 }}>
@@ -711,13 +796,37 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
                         </li>
                       ))}
                     </ul>
-                  ) : (
-                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Foundation modules</span>
-                  )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+
+          {/* Right Arrow Button */}
+          <button
+            type="button"
+            onClick={() => scrollStep3('right')}
+            style={{
+              position: 'absolute',
+              right: '0px',
+              zIndex: 10,
+              background: 'white',
+              border: '1px solid var(--border-cream)',
+              borderRadius: '50%',
+              width: '36px',
+              height: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              boxShadow: 'var(--shadow-sm)',
+              color: 'var(--brand-primary)',
+              fontWeight: 'bold',
+              fontSize: '18px'
+            }}
+          >
+            →
+          </button>
         </div>
 
         <div style={{ borderTop: '1px solid var(--border-cream)', paddingTop: '24px', display: 'flex', justifyContent: 'space-between' }}>
@@ -1116,29 +1225,108 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
   };
 
   const renderSuccess = () => (
-    <div className="success-card" style={{ padding: '60px 20px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div className="success-card" style={{ padding: '60px 20px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
       <div style={{
-        backgroundColor: 'white',
-        borderRadius: '16px',
+        background: 'rgba(255, 255, 255, 0.85)',
+        backdropFilter: 'blur(16px)',
+        borderRadius: '24px',
         width: '100%',
-        maxWidth: '480px',
-        padding: '40px',
-        boxShadow: 'var(--shadow-premium)',
-        border: '1px solid var(--border-cream)',
-        textAlign: 'center'
+        maxWidth: '520px',
+        padding: '50px 40px',
+        boxShadow: '0 20px 40px rgba(66, 75, 84, 0.08), 0 1px 3px rgba(66, 75, 84, 0.04)',
+        border: '1px solid rgba(229, 210, 205, 0.5)',
+        textAlign: 'center',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
-        <div className="success-check-badge" style={{ backgroundColor: 'var(--accent-cream)', color: 'var(--brand-primary)', width: '64px', height: '64px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', margin: '0 auto 24px auto' }}>✓</div>
-        <h2 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--brand-primary)', marginBottom: '8px' }}>Journey Starts Here</h2>
-        <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '28px' }}>
-          Your student profile has been created successfully. Welcome to ITPath.
-        </p>
-        <button
-          className="onboarding-primary-btn"
-          onClick={handleFinish}
-          style={{ width: '100%', backgroundColor: 'var(--brand-primary)', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}
-        >
-          Continue to ITPath
-        </button>
+        {/* Decorative background glows */}
+        <div style={{
+          position: 'absolute',
+          top: '-10%',
+          right: '-10%',
+          width: '200px',
+          height: '200px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(213, 172, 169, 0.3) 0%, rgba(255,255,255,0) 70%)',
+          filter: 'blur(20px)',
+          zIndex: 0
+        }} />
+        <div style={{
+          position: 'absolute',
+          bottom: '-10%',
+          left: '-10%',
+          width: '200px',
+          height: '200px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(235, 207, 178, 0.3) 0%, rgba(255,255,255,0) 70%)',
+          filter: 'blur(20px)',
+          zIndex: 0
+        }} />
+
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          {/* Celebratory Check Mark Circle */}
+          <div style={{
+            background: 'linear-gradient(135deg, #B38D97 0%, #D5ACA9 100%)',
+            color: 'white',
+            width: '72px',
+            height: '72px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '32px',
+            margin: '0 auto 28px auto',
+            boxShadow: '0 8px 20px rgba(179, 141, 151, 0.3)',
+          }}>
+            ✓
+          </div>
+
+          <h2 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--brand-primary)', marginBottom: '12px', letterSpacing: '-0.5px' }}>
+            Welcome Aboard!
+          </h2>
+          
+          <p style={{ fontSize: '15px', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '32px', padding: '0 10px' }}>
+            Hi <strong>{fullName}</strong>, your student profile has been successfully created. Your personalized path to becoming a <strong>{careerDirection}</strong> is now initialized.
+          </p>
+
+          {/* Onboarding Complete Stat Card */}
+          <div style={{
+            backgroundColor: '#FCFAF7',
+            border: '1px solid var(--border-cream)',
+            borderRadius: '16px',
+            padding: '18px 24px',
+            marginBottom: '36px',
+            textAlign: 'left',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Onboarding Status</div>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--brand-primary)' }}>Profile 100% Prepared</div>
+            </div>
+            <span style={{ fontSize: '24px' }}>🚀</span>
+          </div>
+
+          <button
+            className="onboarding-primary-btn"
+            onClick={handleFinish}
+            style={{
+              width: '100%',
+              backgroundColor: 'var(--brand-primary)',
+              color: 'white',
+              border: 'none',
+              padding: '16px',
+              borderRadius: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              fontSize: '15px',
+              boxShadow: '0 4px 12px rgba(66, 75, 84, 0.15)',
+            }}
+          >
+            Go to Login
+          </button>
+        </div>
       </div>
     </div>
   );

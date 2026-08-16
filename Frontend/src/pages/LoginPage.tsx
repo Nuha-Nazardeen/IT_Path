@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
+import { useAuth } from '../hooks/useAuth';
 
 interface LoginPageProps {
   onNavigate: (path: string) => void;
@@ -9,17 +10,25 @@ interface LoginPageProps {
 export function LoginPage({ onNavigate }: LoginPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { login } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const normalizedEmail = email.trim().toLowerCase();
-    localStorage.setItem('itpath_logged_in_user', JSON.stringify({ email: normalizedEmail }));
-    if (normalizedEmail === 'admin@gmail.com' && password === 'admin123') {
-      alert('Mock Login successful as Administrator');
-      onNavigate('/admin-dashboard');
-    } else {
-      alert(`Mock Login successful for: ${email}`);
-      onNavigate('/dashboard');
+
+    try {
+      const user = await login({ email: normalizedEmail, password });
+      
+      if (user.role === 'admin') {
+        alert('Login successful as Administrator');
+        onNavigate('/admin-dashboard');
+      } else {
+        alert(`Login successful for: ${user.fullName}`);
+        onNavigate('/dashboard');
+      }
+    } catch (error: any) {
+      console.error('Login error:', error);
+      alert(error.message || 'Failed to connect to backend server. Please verify backend is running.');
     }
   };
 

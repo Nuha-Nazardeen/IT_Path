@@ -82,9 +82,11 @@ const AdminIcons = {
   )
 };
 
+import { useAuth } from '../hooks/useAuth';
+
 export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'academic' | 'paths' | 'skills' | 'resources' | 'projects' | 'reports' | 'settings'>('overview');
-  const [searchTerm, setSearchTerm] = useState('');
+  const { logout } = useAuth();
   
   // Search & filter states
   const [studentSearch, setStudentSearch] = useState('');
@@ -99,8 +101,8 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
   const [selectedCareerPath, setSelectedCareerPath] = useState<any>(null);
   const [academicSubTab, setAcademicSubTab] = useState<'universities' | 'faculties' | 'degrees'>('universities');
 
-  const handleLogout = () => {
-    localStorage.removeItem('itpath_logged_in_user');
+  const handleLogout = async () => {
+    await logout();
     onNavigate('/');
   };
 
@@ -148,11 +150,11 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
   ]);
 
   // Mock Universities Data
-  const [universities, setUniversities] = useState([
+  const universities = [
     { name: 'Uva Wellassa University', location: 'Badulla', status: 'Active', studentCount: 248 },
     { name: 'University of Colombo', location: 'Colombo', status: 'Active', studentCount: 1204 },
     { name: 'Sri Lanka Institute of Information Technology', location: 'Malabe', status: 'Inactive', studentCount: 850 }
-  ]);
+  ];
 
   // Mock Career Paths Data
   const careerPaths = [
@@ -165,12 +167,12 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
   ];
 
   // Mock Skills Data
-  const [skills, setSkills] = useState([
+  const skills = [
     { name: 'SQL', category: 'Database', paths: 'Software Engineer, Data Analyst', difficulty: 'Intermediate', status: 'Active' },
     { name: 'Python', category: 'Programming', paths: 'Software Engineer, Data Scientist', difficulty: 'Beginner', status: 'Active' },
     { name: 'React', category: 'Frontend', paths: 'Software Engineer', difficulty: 'Intermediate', status: 'Active' },
     { name: 'Docker', category: 'DevOps', paths: 'DevOps Engineer', difficulty: 'Advanced', status: 'Active' }
-  ]);
+  ];
 
   // Mock Project Templates
   const projectTemplates = [

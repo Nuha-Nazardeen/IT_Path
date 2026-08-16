@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DashboardPreview } from './DashboardPreview';
-import { Button } from '../common/Button';
+import heroBg from '../../assets/images/2.jpg';
 
 interface HeroSectionProps {
   onStartJourney?: () => void;
@@ -56,28 +55,43 @@ export function HeroSection({ onStartJourney, onSeeHowItWorks }: HeroSectionProp
   };
 
   return (
-    <section className="hero-section">
+    <section className="hero-section" style={{ backgroundImage: `url(${heroBg})` }}>
+      <div className="hero-overlay" />
       <div className="hero-content">
         <span className="badge">Built for IT Undergraduates</span>
         <h1 className="hero-title">
-          Your IT Degree Is Only One Part of the Journey.
+          Build Your IT Path With Confidence
         </h1>
         <p className="hero-description">
-          Balance university, build industry-ready skills, and turn your academic work into career evidence — all in one place.
+          Plan your academic journey, develop industry-ready skills, and discover the right career path for your future in technology.
         </p>
         <div className="hero-actions">
-          <Button variant="primary" onClick={handleHeroAction}>
-            {user ? `Go to My Dashboard` : `Build My IT Journey`} {arrowRight}
-          </Button>
-          <Button variant="secondary" onClick={onSeeHowItWorks}>
-            See How It Works
-          </Button>
+          <button className="hero-pill-primary" onClick={handleHeroAction}>
+            Explore Your Path {arrowRight}
+          </button>
+          <button className="hero-pill-secondary" onClick={onSeeHowItWorks}>
+            Get Started
+          </button>
         </div>
+        
+        <div className="hero-search-container" style={{ marginBottom: '24px' }}>
+          <input 
+            type="text" 
+            className="hero-search-input" 
+            placeholder="Search courses, skills or careers..." 
+          />
+          <span className="hero-search-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </span>
+        </div>
+
         <div className="trust-subtext">
-          <span>🛡️</span> {user ? `Logged in as ${user.fullName} (${user.academic.studentId})` : `Designed for the real challenges of IT students.`}
+          <span>🛡️</span> {user ? `Logged in as ${user.fullName}` : `Designed for the real challenges of IT students.`}
         </div>
       </div>
-      <DashboardPreview />
     </section>
   );
 }
