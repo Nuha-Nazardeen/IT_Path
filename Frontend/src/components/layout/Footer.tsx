@@ -40,7 +40,7 @@ export function Footer() {
 
       <div className="footer-bottom">
         <p className="copyright">
-          © 2024 ITPath Academic & Career Development
+          © 2024 Techora Academic & Career Development
         </p>
       </div>
     </footer>

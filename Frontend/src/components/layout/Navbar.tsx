@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useAuth } from '../../hooks/useAuth';
 import { Logo } from '../common/Logo';
 
 interface NavbarProps {
@@ -7,31 +7,7 @@ interface NavbarProps {
 }
 
 export function Navbar({ onNavigate, activePath = '/' }: NavbarProps) {
-  const [user, setUser] = useState<any>(null);
-
-  useEffect(() => {
-    const session = localStorage.getItem('itpath_logged_in_user');
-    if (session) {
-      try {
-        const parsedSession = JSON.parse(session);
-        if (parsedSession.email === 'admin@gmail.com') {
-          setUser({ fullName: 'Admin User', email: 'admin@gmail.com', isAdmin: true });
-          return;
-        }
-      } catch (e) {}
-
-      const stored = localStorage.getItem('itpath_registered_user');
-      if (stored) {
-        try {
-          setUser(JSON.parse(stored));
-        } catch (e) {
-          setUser({ fullName: 'Student', academic: { degree: 'IT Programme' }, career: 'Software Engineering' });
-        }
-      } else {
-        setUser({ fullName: 'Student', academic: { degree: 'IT Programme' }, career: 'Software Engineering' });
-      }
-    }
-  }, []);
+  const { user, logout } = useAuth();
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
     e.preventDefault();
@@ -40,19 +16,22 @@ export function Navbar({ onNavigate, activePath = '/' }: NavbarProps) {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('itpath_logged_in_user');
-    setUser(null);
-    if (onNavigate) {
-      onNavigate('/');
-    } else {
-      window.location.reload();
+  const handleLogout = async () => {
+    try {
+      await logout();
+      if (onNavigate) {
+        onNavigate('/');
+      } else {
+        window.location.reload();
+      }
+    } catch (e) {
+      console.error('Logout failed:', e);
     }
   };
 
   return (
     <header className="navbar">
-      <Logo />
+      <Logo onNavigate={onNavigate} />
       <nav>
         <ul className="nav-links">
           <li>
@@ -111,7 +90,7 @@ export function Navbar({ onNavigate, activePath = '/' }: NavbarProps) {
             <button 
               onClick={() => {
                 if (onNavigate) {
-                  if (user.isAdmin) {
+                  if (user.role === 'admin') {
                     onNavigate('/admin-dashboard');
                   } else {
                     onNavigate('/dashboard');

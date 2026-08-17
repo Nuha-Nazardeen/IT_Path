@@ -37,7 +37,7 @@ export function FinalCTASection({ onStartJourney, onSeeHowItWorks }: FinalCTASec
     <section className="cta-section">
       <div className="cta-container">
         <h2 className="cta-title">
-          {user ? `Your Customized ITPath is Ready` : `Ready to Take Control of Your IT Career?`}
+          {user ? `Your Customized Techora is Ready` : `Ready to Take Control of Your IT Career?`}
         </h2>
         <p className="cta-description">
           {user 

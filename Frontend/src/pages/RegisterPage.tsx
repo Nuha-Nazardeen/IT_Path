@@ -220,7 +220,7 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
         overflow: 'hidden'
       }}>
         <div>
-          <h1 style={{ fontSize: '32px', fontWeight: 800, color: 'var(--brand-primary)', marginBottom: '12px' }}>ITPath</h1>
+          <h1 style={{ fontSize: '32px', fontWeight: 800, color: 'var(--brand-primary)', marginBottom: '12px' }}>Techora</h1>
           <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '100px' }}>
             Bridging the gap between academic theory and industry reality. Your journey to professional excellence starts here.
           </p>
@@ -268,12 +268,12 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
               University life is more than attending lectures and completing assignments. As an IT undergraduate, you also need to build practical skills, work on projects, explore your career path, and prepare for the industry. Balancing all of this alongside assessments, examinations and academic responsibilities can be challenging.
             </p>
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-              ITPath helps you bring these areas together in one place. Organize your academic journey, develop the skills required for your chosen career, track your progress, and gradually build your path from university to industry.
+              Techora helps you bring these areas together in one place. Organize your academic journey, develop the skills required for your chosen career, track your progress, and gradually build your path from university to industry.
             </p>
           </div>
         </div>
         <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-          © {new Date().getFullYear()} ITPath Sri Lanka
+          © {new Date().getFullYear()} Techora Sri Lanka
         </div>
       </div>
     );
@@ -1119,7 +1119,7 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
           <div style={{ marginBottom: '24px' }}>
             <h2 style={{ fontSize: '32px', fontWeight: 800, color: 'var(--brand-primary)', marginBottom: '6px' }}>Review Your Profile</h2>
             <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
-              Please review your ITPath profile summary before finalizing your registration.
+              Please review your Techora profile summary before finalizing your registration.
             </p>
           </div>
 
@@ -1132,7 +1132,7 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
             marginBottom: '24px'
           }}>
             <h3 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--brand-primary)', marginBottom: '20px', borderBottom: '1px solid var(--border-cream)', paddingBottom: '12px' }}>
-              Your ITPath Profile
+              Your Techora Profile
             </h3>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -1216,7 +1216,7 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
                 fontSize: '13px'
               }}
             >
-              Create My ITPath Account
+              Create My Techora Account
             </button>
           </div>
         </div>
