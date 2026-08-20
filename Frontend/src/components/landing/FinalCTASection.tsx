@@ -3,10 +3,9 @@ import { Button } from '../common/Button';
 
 interface FinalCTASectionProps {
   onStartJourney?: () => void;
-  onSeeHowItWorks?: () => void;
 }
 
-export function FinalCTASection({ onStartJourney, onSeeHowItWorks }: FinalCTASectionProps) {
+export function FinalCTASection({ onStartJourney }: FinalCTASectionProps) {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
@@ -42,14 +41,20 @@ export function FinalCTASection({ onStartJourney, onSeeHowItWorks }: FinalCTASec
         <p className="cta-description">
           {user 
             ? `Welcome aboard! You have successfully personalized your academic and career roadmap. Jump into your student dashboard to get started.` 
-            : `Stop guessing what skills recruiters want. Plan, verify, and package your academic career evidence in one structured, stress-free workspace.`
+            : `Stop guessing what skills you need. Build your roadmap, track your progress, and prepare for your IT career with confidence.`
           }
         </p>
         <div className="cta-buttons">
           <Button variant="cta-primary" onClick={handleCTAAction}>
             {user ? `Go to My Dashboard` : `Start My Journey`}
           </Button>
-          <Button variant="cta-secondary" onClick={onSeeHowItWorks}>
+          <Button 
+            variant="cta-secondary" 
+            onClick={() => {
+              const el = document.getElementById('how-it-works');
+              el?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
             Learn More
           </Button>
         </div>

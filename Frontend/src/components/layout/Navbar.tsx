@@ -37,7 +37,10 @@ export function Navbar({ onNavigate, activePath = '/' }: NavbarProps) {
           <li>
             <a 
               href="#" 
-              onClick={(e) => handleNavClick(e, '/')} 
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('.hero-section')?.scrollIntoView({ behavior: 'smooth' });
+              }} 
               className={`nav-link ${activePath === '/' ? 'active' : ''}`}
             >
               Home
@@ -47,7 +50,8 @@ export function Navbar({ onNavigate, activePath = '/' }: NavbarProps) {
             <a 
               href="#how-it-works" 
               className="nav-link"
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 const el = document.getElementById('how-it-works');
                 el?.scrollIntoView({ behavior: 'smooth' });
               }}
@@ -57,26 +61,28 @@ export function Navbar({ onNavigate, activePath = '/' }: NavbarProps) {
           </li>
           <li>
             <a 
+              href="#career-paths" 
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                const el = document.getElementById('career-paths');
+                el?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              Career Paths
+            </a>
+          </li>
+          <li>
+            <a 
               href="#features" 
               className="nav-link"
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 const el = document.getElementById('features');
                 el?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
               Features
-            </a>
-          </li>
-          <li>
-            <a 
-              href="#tripartite-challenge" 
-              className="nav-link"
-              onClick={() => {
-                const el = document.getElementById('tripartite-challenge');
-                el?.scrollIntoView({ behavior: 'smooth' });
-              }}
-            >
-              Career Paths
             </a>
           </li>
         </ul>

@@ -3,10 +3,9 @@ import heroBg from '../../assets/images/2.jpg';
 
 interface HeroSectionProps {
   onStartJourney?: () => void;
-  onSeeHowItWorks?: () => void;
 }
 
-export function HeroSection({ onStartJourney, onSeeHowItWorks }: HeroSectionProps) {
+export function HeroSection({ onStartJourney }: HeroSectionProps) {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
@@ -60,32 +59,28 @@ export function HeroSection({ onStartJourney, onSeeHowItWorks }: HeroSectionProp
       <div className="hero-content">
         <span className="badge">Built for IT Undergraduates</span>
         <h1 className="hero-title">
-          Build Your IT Path With Confidence
+          Build Your Tech Career With Confidence
         </h1>
         <p className="hero-description">
           Plan your academic journey, develop industry-ready skills, and discover the right career path for your future in technology.
         </p>
         <div className="hero-actions">
-          <button className="hero-pill-primary" onClick={handleHeroAction}>
-            Explore Your Path {arrowRight}
+          <button 
+            className="hero-pill-primary" 
+            onClick={() => {
+              const el = document.getElementById('career-paths');
+              el?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            Explore Career Paths {arrowRight}
           </button>
-          <button className="hero-pill-secondary" onClick={onSeeHowItWorks}>
-            Get Started
+          <button className="hero-pill-secondary" onClick={handleHeroAction}>
+            Start My Journey
           </button>
         </div>
         
-        <div className="hero-search-container" style={{ marginBottom: '24px' }}>
-          <input 
-            type="text" 
-            className="hero-search-input" 
-            placeholder="Search courses, skills or careers..." 
-          />
-          <span className="hero-search-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-          </span>
+        <div style={{ color: 'var(--text-secondary)', fontSize: '14px', fontWeight: 600, marginBottom: '24px', fontStyle: 'italic', opacity: 0.8 }}>
+          Built for the journey from university to industry.
         </div>
 
         <div className="trust-subtext">

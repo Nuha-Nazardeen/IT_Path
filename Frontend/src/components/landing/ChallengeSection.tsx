@@ -30,9 +30,9 @@ export function ChallengeSection() {
   ];
 
   return (
-    <section className="challenge-section" id="tripartite-challenge">
+    <section className="challenge-section" id="challenges">
       <SectionHeading 
-        title="University Doesn't Stop When Career Preparation Begins."
+        title="Balancing University and Career Preparation Isn't Easy."
         description="The modern IT student faces a tripartite challenge: maintaining grades, deciphering ambiguous career requirements, and building a portfolio before graduation."
       />
 

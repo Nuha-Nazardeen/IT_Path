@@ -11,18 +11,22 @@ export function FeaturesSection() {
     {
       icon: '🎯',
       title: 'Dynamic Skill Maps',
-      description: 'See exactly where you stand against industry requirements in real-time.'
+      description: 'See where you stand against the skills required for your selected career.'
     },
     {
       icon: '📅',
-      iconClass: 'icon-calendar',
-      title: 'Smart Academic Sync',
-      description: 'Sync deadlines and assignments directly to plan your study and upskilling.'
-    } as any, // fallback support
+      title: 'Smart Academic Planning',
+      description: 'Organize academic commitments and career preparation without losing track of either.'
+    },
     {
-      icon: '🛡️',
-      title: 'Portfolio Compiler',
-      description: 'Automatically package school coding projects into clean GitHub-ready evidence.'
+      icon: '🗺️',
+      title: 'Career Roadmaps',
+      description: 'Follow structured roadmaps that guide you from your current skills toward your target IT role.'
+    },
+    {
+      icon: '📈',
+      title: 'Progress Tracking',
+      description: 'Track your development across academic, technical, and career goals.'
     }
   ];
 
@@ -30,8 +34,8 @@ export function FeaturesSection() {
     <section className="features-section" id="features">
       <SectionHeading 
         subtitle="Core Platform"
-        title="Everything You Need in One Hub"
-        description="Specifically engineered for undergraduate IT students balancing heavy workloads."
+        title="Everything You Need to Build Your Career"
+        description="Designed for undergraduate IT students balancing academic workloads and career preparation."
       />
 
       <div className="features-grid">

@@ -116,7 +116,6 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
     if (currentStep === 2) {
       if (!university) newErrors.university = 'Please select your university.';
       if (!degree) newErrors.degree = 'Please select your degree programme.';
-      if (!studentId.trim()) newErrors.studentId = 'University Student ID is required.';
       if (!academicYear) newErrors.academicYear = 'Academic Year is required.';
       if (!semester) newErrors.semester = 'Semester is required.';
       if (!graduationYear) newErrors.graduationYear = 'Graduation Year is required.';
@@ -216,8 +215,10 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
         flexDirection: 'column',
         justifyContent: 'space-between',
         borderRight: '1px solid var(--border-cream)',
-        position: 'relative',
-        overflow: 'hidden'
+        position: 'sticky',
+        top: 0,
+        height: '100vh',
+        overflowY: 'auto'
       }}>
         <div>
           <h1 style={{ fontSize: '32px', fontWeight: 800, color: 'var(--brand-primary)', marginBottom: '12px' }}>Techora</h1>
@@ -581,17 +582,7 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
             {errors.graduationYear && <div className="inline-error">{errors.graduationYear}</div>}
           </div>
 
-          <div className="form-group">
-            <label className="form-label" style={{ fontWeight: 600 }}>University Student ID</label>
-            <input
-              className="form-input"
-              type="text"
-              placeholder="UWU/CST/22/069"
-              value={studentId}
-              onChange={e => setStudentId(e.target.value)}
-            />
-            {errors.studentId && <div className="inline-error">{errors.studentId}</div>}
-          </div>
+
 
           <div className="form-group">
             <label className="form-label" style={{ fontWeight: 600 }}>Specialization / Stream (Optional)</label>
@@ -1286,7 +1277,7 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
           </h2>
           
           <p style={{ fontSize: '15px', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '32px', padding: '0 10px' }}>
-            Hi <strong>{fullName}</strong>, your student profile has been successfully created. Your personalized path to becoming a <strong>{careerDirection}</strong> is now initialized.
+            Hi <strong>{fullName}</strong>, your student profile has been successfully created. Your personalized path to becoming a <strong>{careerDirection}</strong> is now initialized. We wish you all the best for your career journey!
           </p>
 
           {/* Onboarding Complete Stat Card */}
