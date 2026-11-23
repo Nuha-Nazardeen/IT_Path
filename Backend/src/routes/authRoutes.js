@@ -1,25 +1,26 @@
-const express = require("express");
+import express from "express";
+import { register, login, getMe, logout } from "../controllers/authController.js";
+
 const router = express.Router();
-const authController = require("../controllers/authController");
 
 // @route   POST /api/auth/register
 // @desc    Register a new user
 // @access  Public
-router.post("/register", authController.register);
+router.post("/register", register);
 
 // @route   POST /api/auth/login
 // @desc    Authenticate user & start session
 // @access  Public
-router.post("/login", authController.login);
+router.post("/login", login);
 
 // @route   GET /api/auth/me
 // @desc    Get session user details
 // @access  Public (returns { authenticated: false } if no session, does not throw 401)
-router.get("/me", authController.getMe);
+router.get("/me", getMe);
 
 // @route   POST /api/auth/logout
 // @desc    Destroy session and logout user
 // @access  Public
-router.post("/logout", authController.logout);
+router.post("/logout", logout);
 
-module.exports = router;
+export default router;

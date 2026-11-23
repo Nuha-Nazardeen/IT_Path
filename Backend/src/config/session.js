@@ -1,23 +1,27 @@
-const session = require("express-session");
-const MongoStore = require("connect-mongo").default;
+import session from "express-session";
+import MongoStore from "connect-mongo";
 
-const configureSession = () => {
+export const configureSession = () => {
+  if (!process.env.SESSION_SECRET) {
+    throw new Error("SESSION_SECRET is missing. Add it to Backend/.env.");
+  }
+
+  const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+
   return session({
-    secret: process.env.SESSION_SECRET || "itpath_fallback_secret_key_123",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URI,
+      mongoUrl: mongoUri,
       collectionName: "sessions",
-      ttl: 30 * 60, // 30 minutes in seconds
+      ttl: 30 * 60,
     }),
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 30 * 60 * 1000, // 30 minutes in milliseconds
+      maxAge: 30 * 60 * 1000,
     },
   });
 };
-
-module.exports = configureSession;

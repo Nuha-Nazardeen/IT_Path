@@ -1,12 +1,8 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
   {
-    fullName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    fullName: { type: String, required: true, trim: true },
     uniEmail: {
       type: String,
       required: true,
@@ -14,10 +10,7 @@ const UserSchema = new mongoose.Schema(
       trim: true,
       lowercase: true,
     },
-    password: {
-      type: String,
-      required: true,
-    },
+    password: { type: String, required: true, select: false },
     role: {
       type: String,
       enum: ["student", "admin"],
@@ -32,23 +25,28 @@ const UserSchema = new mongoose.Schema(
       graduationYear: { type: String, trim: true },
       specialization: { type: String, trim: true },
     },
-    career: {
-      type: String,
-      trim: true,
-    },
-    skills: {
-      type: Map,
-      of: String, // e.g., { "Python": "INT", "React": "BEG" }
-    },
+    career: { type: String, trim: true },
+    skills: { type: Map, of: String },
     planning: {
       weekdayHours: { type: String, trim: true },
       weekendHours: { type: String, trim: true },
       challenges: [{ type: String, trim: true }],
     },
+    profile: {
+      profilePhotoUrl: { type: String, trim: true },
+      professionalHeadline: { type: String, trim: true },
+      about: { type: String, trim: true },
+      links: [
+        { label: { type: String, trim: true }, url: { type: String, trim: true } },
+      ],
+      notificationPreferences: {
+        emailReminders: { type: Boolean, default: true },
+        deadlineAlerts: { type: Boolean, default: true },
+        weeklyDigest: { type: Boolean, default: true },
+      },
+    },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-module.exports = mongoose.model("User", UserSchema);
+export default mongoose.model("User", UserSchema);
