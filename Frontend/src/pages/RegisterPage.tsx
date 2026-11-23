@@ -69,7 +69,6 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
   const [otherUniversity, setOtherUniversity] = useState('');
   const [degree, setDegree] = useState('');
   const [otherDegree, setOtherDegree] = useState('');
-  const [studentId, setStudentId] = useState('');
   const [academicYear, setAcademicYear] = useState('');
   const [semester, setSemester] = useState('');
   const [graduationYear, setGraduationYear] = useState('');
@@ -143,7 +142,6 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
       academic: {
         university: university === 'Other' ? otherUniversity : university,
         degree: degree === 'Other' ? otherDegree : degree,
-        studentId,
         academicYear,
         semester,
         graduationYear,
