@@ -26,9 +26,10 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
         alert(`Login successful for: ${user.fullName}`);
         onNavigate('/dashboard');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login error:', error);
-      alert(error.message || 'Failed to connect to backend server. Please verify backend is running.');
+      const message = error instanceof Error ? error.message : 'Failed to connect to backend server. Please verify backend is running.';
+      alert(message);
     }
   };
 

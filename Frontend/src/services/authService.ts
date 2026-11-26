@@ -6,6 +6,38 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+export interface AuthUser {
+  id: string;
+  fullName: string;
+  role: "student" | "admin";
+}
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterPayload {
+  fullName: string;
+  uniEmail: string;
+  password: string;
+  academic: {
+    university: string;
+    degree: string;
+    academicYear: string;
+    semester: string;
+    graduationYear: string;
+    specialization: string;
+  };
+  career: string;
+  skills: Record<string, "BEG" | "INT" | "ADV">;
+  planning: {
+    weekdayHours: string;
+    weekendHours: string;
+    challenges: string[];
+  };
+}
+
 const getErrorMessage = (error: unknown, fallback: string) => {
   if (axios.isAxiosError(error)) {
     return error.response?.data?.message || error.message || fallback;
@@ -14,30 +46,30 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 };
 
 export const authService = {
-  async register(profileData: any): Promise<{ message: string }> {
+  async register(profileData: RegisterPayload): Promise<{ message: string }> {
     try {
       const response = await api.post("/auth/register", profileData);
       return response.data;
     } catch (error) {
-      throw new Error(getErrorMessage(error, "Registration failed"));
+      throw new Error(getErrorMessage(error, "Registration failed"), { cause: error });
     }
   },
 
-  async login(credentials: any): Promise<{ message: string; user: any }> {
+  async login(credentials: LoginCredentials): Promise<{ message: string; user: AuthUser }> {
     try {
       const response = await api.post("/auth/login", credentials);
       return response.data;
     } catch (error) {
-      throw new Error(getErrorMessage(error, "Login failed"));
+      throw new Error(getErrorMessage(error, "Login failed"), { cause: error });
     }
   },
 
-  async getMe(): Promise<{ authenticated: boolean; user?: any }> {
+  async getMe(): Promise<{ authenticated: boolean; user?: AuthUser }> {
     try {
       const response = await api.get("/auth/me");
       return response.data;
     } catch (error) {
-      throw new Error(getErrorMessage(error, "Failed to fetch session"));
+      throw new Error(getErrorMessage(error, "Failed to fetch session"), { cause: error });
     }
   },
 
@@ -46,7 +78,7 @@ export const authService = {
       const response = await api.post("/auth/logout");
       return response.data;
     } catch (error) {
-      throw new Error(getErrorMessage(error, "Logout failed"));
+      throw new Error(getErrorMessage(error, "Logout failed"), { cause: error });
     }
   },
 };

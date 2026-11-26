@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { studentApi, getErrorMessage } from '../services/studentApi';
 import { Logo } from '../components/common/Logo';
 import { useAuth } from '../hooks/useAuth';
 
@@ -6,22 +7,43 @@ interface DashboardPageProps {
   onNavigate: (path: string) => void;
 }
 
+type DashboardTab = 'dashboard' | 'academic' | 'roadmap' | 'balance' | 'portfolio' | 'resources';
+
 export function DashboardPage({ onNavigate }: DashboardPageProps) {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'academic' | 'roadmap' | 'balance' | 'portfolio' | 'resources'>('dashboard');
+  const [activeTab, setActiveTab] = useState<DashboardTab>('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const { user: authUser, logout } = useAuth();
+  interface DashboardResponse {
+    user?: { fullName?: string; academic?: { degree?: string; academicYear?: string; university?: string }; career?: string };
+    summary?: { completedModules?: number; modules?: number; completedSkills?: number; skills?: number; completedProjects?: number; projects?: number };
+  }
+  const [dashboardData, setDashboardData] = useState<DashboardResponse | null>(null);
+  const [dashboardError, setDashboardError] = useState('');
 
-  // Mock User Data combined with auth state
+  useEffect(() => {
+    let isMounted = true;
+    studentApi.dashboard()
+      .then((data: DashboardResponse) => {
+        if (isMounted) setDashboardData(data);
+      })
+      .catch((error: unknown) => {
+        if (isMounted) setDashboardError(getErrorMessage(error, 'Unable to load dashboard data'));
+      });
+    return () => { isMounted = false; };
+  }, []);
+
+  const profile = dashboardData?.user;
+  const summary = dashboardData?.summary;
   const user = {
-    name: authUser?.fullName || 'Student',
-    degree: 'BSc Computer Science & Technology',
-    year: '3rd Year',
-    university: 'Uva Wellassa University',
-    careerGoal: 'Software Engineer',
-    careerReadiness: 54,
-    academicExcellence: 72,
-    portfolioStrength: 35
+    name: profile?.fullName || authUser?.fullName || 'Student',
+    degree: profile?.academic?.degree || 'BSc Information Technology',
+    year: profile?.academic?.academicYear || 'Current academic year',
+    university: profile?.academic?.university || 'University',
+    careerGoal: profile?.career || 'Software Engineer',
+    careerReadiness: summary?.skills ? Math.round(((summary.completedSkills || 0) / summary.skills) * 100) : 0,
+    academicExcellence: summary?.modules ? Math.round(((summary.completedModules || 0) / summary.modules) * 100) : 0,
+    portfolioStrength: summary?.projects ? Math.round(((summary.completedProjects || 0) / summary.projects) * 100) : 0
   };
 
   const handleLogout = async () => {
@@ -153,14 +175,14 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
             <h3 style={{ fontSize: '18px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
               📈 Journey Overview
             </h3>
-            <button 
+            <button
               onClick={() => setActiveTab('balance')}
               style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}
             >
               View Detailed Report
             </button>
           </div>
-          
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>
@@ -450,7 +472,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
                 </span>
               ))}
             </div>
-            <button 
+            <button
               onClick={() => setActiveTab('portfolio')}
               style={{ background: 'none', border: 'none', color: 'var(--brand-primary)', fontSize: '14px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
             >
@@ -652,7 +674,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
               <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '16px' }}>
                 IoT based monitoring platform for sustainable farming.
               </p>
-              
+
               <div style={{ height: '8px', backgroundColor: 'rgba(66, 75, 84, 0.1)', borderRadius: '4px', overflow: 'hidden', marginBottom: '20px' }}>
                 <div style={{ width: '68%', height: '100%', backgroundColor: 'var(--brand-primary)' }} />
               </div>
@@ -666,7 +688,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
               </div>
             </div>
 
-            <button 
+            <button
               onClick={() => setActiveTab('portfolio')}
               style={{
                 width: '100%',
@@ -791,7 +813,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
               <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '24px' }}>
                 Intermediate Level • Database Architecture
               </p>
-              
+
               {/* Actions Grid */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
                 {['LEARN', 'PRACTICE', 'BUILD', 'PROVE'].map(action => (
@@ -992,7 +1014,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
             <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '20px' }}>
               Add your latest university project to your portfolio.
             </p>
-            <button 
+            <button
               onClick={() => setActiveTab('portfolio')}
               style={{
                 width: '100%',
@@ -1149,7 +1171,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h3 style={{ fontSize: '20px', fontWeight: 800 }}>Certifications</h3>
               <button style={{ background: 'none', border: 'none', color: 'var(--brand-primary)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
-                + Add Cert
+                + Add Certification
               </button>
             </div>
 
@@ -1206,7 +1228,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
             boxShadow: 'var(--shadow-sm)'
           }}>
             <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '20px' }}>Professional Profiles</h3>
-            
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px', fontWeight: 600 }}>
@@ -1248,7 +1270,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#FAF6F0' }}>
-      
+
       {/* Sidebar - Matches RegisterPage style & user details */}
       <aside style={{
         width: '280px',
@@ -1268,19 +1290,19 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
 
           {/* Navigation Links */}
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {[
+            {([
               { id: 'dashboard', label: 'Dashboard', icon: <Icons.Dashboard /> },
               { id: 'academic', label: 'Academic', icon: <Icons.Academic /> },
               { id: 'roadmap', label: 'Career Roadmap', icon: <Icons.Roadmap /> },
               { id: 'balance', label: 'Balance & Insights', icon: <Icons.Balance /> },
               { id: 'portfolio', label: 'Portfolio', icon: <Icons.Portfolio /> },
               { id: 'resources', label: 'Resources', icon: <Icons.Resources /> }
-            ].map(item => {
+            ] as const).map(item => {
               const isActive = activeTab === item.id;
               return (
                 <button
                   key={item.id}
-                  onClick={() => setActiveTab(item.id as any)}
+                  onClick={() => setActiveTab(item.id)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -1459,7 +1481,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
                   </span>
                   <span style={{ fontWeight: 700 }}>&gt;</span>
                 </button>
-                <button 
+                <button
                   onClick={handleLogout}
                   style={{
                     display: 'flex',
@@ -1484,7 +1506,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
           )}
 
           {/* Trigger Pill */}
-          <button 
+          <button
             onClick={() => setShowAccountMenu(!showAccountMenu)}
             style={{
               display: 'flex',
@@ -1519,7 +1541,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
                 <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Go</span>
               </div>
             </div>
-            
+
             {/* Storefront/Marketplace Icon on the right */}
             <span style={{ color: 'var(--text-secondary)', fontSize: '16px', display: 'flex', alignItems: 'center' }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1533,7 +1555,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
 
       {/* Main Content Area */}
       <main style={{ flex: 1, backgroundColor: '#FFFFFF', display: 'flex', flexDirection: 'column' }}>
-        
+
         {/* Top Header */}
         <header style={{
           display: 'flex',
@@ -1597,6 +1619,20 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
 
         {/* Content Body */}
         <section style={{ padding: '40px 48px', flex: 1, overflowY: 'auto' }}>
+          {dashboardError && (
+            <div style={{
+              marginBottom: '20px',
+              padding: '12px 16px',
+              borderRadius: '10px',
+              backgroundColor: '#FEF2F2',
+              border: '1px solid #FECACA',
+              color: '#991B1B',
+              fontSize: '13px',
+              fontWeight: 600
+            }}>
+              {dashboardError}
+            </div>
+          )}
           {activeTab === 'dashboard' && renderDashboardView()}
           {activeTab === 'academic' && renderAcademicView()}
           {activeTab === 'roadmap' && renderRoadmapView()}

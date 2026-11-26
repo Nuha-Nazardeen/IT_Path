@@ -1,70 +1,90 @@
-import { createContext, useState, useEffect, type ReactNode } from "react";
-import { authService } from "../services/authService";
+import { useState, useEffect, useCallback, useRef, type ReactNode } from "react";
+import { authService, type LoginCredentials } from "../services/authService";
+import { AuthContext, type User } from "./auth-context";
 
-export interface User {
-  id: string;
-  fullName: string;
-  role: "student" | "admin";
-}
-
-interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (credentials: any) => Promise<User>;
-  logout: () => Promise<void>;
-  checkSession: () => Promise<void>;
-  sessionError: string | null;
-  clearSessionError: () => void;
-}
-
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export type { User };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [sessionError, setSessionError] = useState<string | null>(null);
+  const wasAuthenticatedRef = useRef<boolean>(false);
 
-  const checkSession = async () => {
+  const checkSession = useCallback(async () => {
     try {
       const data = await authService.getMe();
       if (data.authenticated && data.user) {
         setUser(data.user);
         setIsAuthenticated(true);
+        wasAuthenticatedRef.current = true;
         setSessionError(null);
       } else {
-        // If they were authenticated, but session is no longer active, show session expired message
-        if (isAuthenticated) {
+        if (wasAuthenticatedRef.current) {
           setSessionError("Your session has expired. Please log in again.");
         }
         setUser(null);
         setIsAuthenticated(false);
+        wasAuthenticatedRef.current = false;
       }
     } catch (error) {
       console.error("Session check failed:", error);
       setUser(null);
       setIsAuthenticated(false);
+      wasAuthenticatedRef.current = false;
     } finally {
       setIsLoading(false);
     }
-  };
-
-  useEffect(() => {
-    checkSession();
   }, []);
 
-  const login = async (credentials: any): Promise<User> => {
+  useEffect(() => {
+    let isMounted = true;
+    authService
+      .getMe()
+      .then((data) => {
+        if (!isMounted) return;
+        if (data.authenticated && data.user) {
+          setUser(data.user);
+          setIsAuthenticated(true);
+          wasAuthenticatedRef.current = true;
+          setSessionError(null);
+        } else {
+          setUser(null);
+          setIsAuthenticated(false);
+          wasAuthenticatedRef.current = false;
+        }
+      })
+      .catch((error: unknown) => {
+        console.error("Session check failed:", error);
+        if (!isMounted) return;
+        setUser(null);
+        setIsAuthenticated(false);
+        wasAuthenticatedRef.current = false;
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const login = async (credentials: LoginCredentials): Promise<User> => {
     setIsLoading(true);
     try {
       const data = await authService.login(credentials);
       setUser(data.user);
       setIsAuthenticated(true);
+      wasAuthenticatedRef.current = true;
       setSessionError(null);
       return data.user;
-    } catch (error: any) {
+    } catch (error: unknown) {
       setUser(null);
       setIsAuthenticated(false);
+      wasAuthenticatedRef.current = false;
       throw error;
     } finally {
       setIsLoading(false);
@@ -80,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setUser(null);
       setIsAuthenticated(false);
+      wasAuthenticatedRef.current = false;
       setSessionError(null);
       setIsLoading(false);
     }

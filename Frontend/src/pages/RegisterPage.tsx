@@ -159,9 +159,10 @@ export function RegisterPage({ onNavigate }: RegisterPageProps) {
     try {
       await authService.register(studentProfile);
       setStep(6);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Registration error:', error);
-      alert(error.message || 'Failed to connect to backend server. Please verify backend is running.');
+      const message = error instanceof Error ? error.message : 'Failed to connect to backend server. Please verify backend is running.';
+      alert(message);
     }
   };
 

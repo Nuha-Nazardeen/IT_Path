@@ -137,7 +137,7 @@ export function CareerPathsSection() {
       return false;
     };
 
-    let centerInterval: any;
+    let centerInterval: ReturnType<typeof setInterval> | undefined;
     if (!centerScroll()) {
       centerInterval = setInterval(() => {
         if (centerScroll()) {

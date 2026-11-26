@@ -1,28 +1,33 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '../common/Button';
 
 interface FinalCTASectionProps {
   onStartJourney?: () => void;
 }
 
-export function FinalCTASection({ onStartJourney }: FinalCTASectionProps) {
-  const [user, setUser] = useState<any>(null);
+interface StoredLandingUser {
+  fullName: string;
+  academic: { degree: string };
+  career: string;
+}
 
-  useEffect(() => {
-    const session = localStorage.getItem('itpath_logged_in_user');
-    if (session) {
-      const stored = localStorage.getItem('itpath_registered_user');
-      if (stored) {
-        try {
-          setUser(JSON.parse(stored));
-        } catch (e) {
-          setUser({ fullName: 'Student', academic: { degree: 'IT Programme' }, career: 'Software Engineering' });
-        }
-      } else {
-        setUser({ fullName: 'Student', academic: { degree: 'IT Programme' }, career: 'Software Engineering' });
-      }
+function getStoredLandingUser(): StoredLandingUser | null {
+  const session = localStorage.getItem('itpath_logged_in_user');
+  if (!session) return null;
+
+  const stored = localStorage.getItem('itpath_registered_user');
+  if (stored) {
+    try {
+      return JSON.parse(stored) as StoredLandingUser;
+    } catch {
+      return { fullName: 'Student', academic: { degree: 'IT Programme' }, career: 'Software Engineering' };
     }
-  }, []);
+  }
+  return { fullName: 'Student', academic: { degree: 'IT Programme' }, career: 'Software Engineering' };
+}
+
+export function FinalCTASection({ onStartJourney }: FinalCTASectionProps) {
+  const [user] = useState<StoredLandingUser | null>(() => getStoredLandingUser());
 
   const handleCTAAction = () => {
     if (user) {

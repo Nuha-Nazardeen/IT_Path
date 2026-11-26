@@ -84,8 +84,32 @@ const AdminIcons = {
 
 import { useAuth } from '../hooks/useAuth';
 
+type AdminTab = 'overview' | 'users' | 'academic' | 'paths' | 'skills' | 'resources' | 'projects' | 'reports' | 'settings';
+type AcademicSubTab = 'universities' | 'faculties' | 'degrees';
+
+interface Student {
+  id: string;
+  name: string;
+  email: string;
+  university: string;
+  degree: string;
+  year: string;
+  careerGoal: string;
+  completion: number;
+  status: string;
+  skills: string[];
+  projects: string[];
+}
+
+interface CareerPath {
+  name: string;
+  students: number;
+  skills: number;
+  status: string;
+}
+
 export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'academic' | 'paths' | 'skills' | 'resources' | 'projects' | 'reports' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<AdminTab>('overview');
   const { logout } = useAuth();
   
   // Search & filter states
@@ -96,10 +120,10 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
   const [statusFilter, setStatusFilter] = useState('');
 
   // Selected entities for detail panels / modals
-  const [selectedStudent, setSelectedStudent] = useState<any>(null);
-  const [confirmDeactivateTarget, setConfirmDeactivateTarget] = useState<any>(null);
-  const [selectedCareerPath, setSelectedCareerPath] = useState<any>(null);
-  const [academicSubTab, setAcademicSubTab] = useState<'universities' | 'faculties' | 'degrees'>('universities');
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [confirmDeactivateTarget, setConfirmDeactivateTarget] = useState<Student | null>(null);
+  const [selectedCareerPath, setSelectedCareerPath] = useState<CareerPath | null>(null);
+  const [academicSubTab, setAcademicSubTab] = useState<AcademicSubTab>('universities');
 
   const handleLogout = async () => {
     await logout();
@@ -107,7 +131,7 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
   };
 
   // Mock Students Data
-  const [students, setStudents] = useState([
+  const [students, setStudents] = useState<Student[]>([
     {
       id: 'S001',
       name: 'Nuha Nazardeen',
@@ -579,14 +603,14 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
 
       {/* Tabs Menu inside Academic Data */}
       <div style={{ display: 'flex', gap: '24px', borderBottom: '1px solid var(--border-cream)', paddingBottom: '12px' }}>
-        {[
+        {([
           { id: 'universities', label: 'UNIVERSITIES' },
           { id: 'faculties', label: 'FACULTIES' },
           { id: 'degrees', label: 'DEGREE PROGRAMMES' }
-        ].map(tab => (
+        ] as const).map(tab => (
           <button
             key={tab.id}
-            onClick={() => setAcademicSubTab(tab.id as any)}
+            onClick={() => setAcademicSubTab(tab.id)}
             style={{
               background: 'none',
               border: 'none',
@@ -1007,7 +1031,7 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
 
           {/* Navigation Links */}
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            {[
+            {([
               { id: 'overview', label: 'Overview', icon: <AdminIcons.Overview /> },
               { id: 'users', label: 'Users', icon: <AdminIcons.Users /> },
               { id: 'academic', label: 'Academic Data', icon: <AdminIcons.Academic /> },
@@ -1016,13 +1040,13 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
               { id: 'resources', label: 'Resources', icon: <AdminIcons.Resources /> },
               { id: 'projects', label: 'Projects', icon: <AdminIcons.Projects /> },
               { id: 'reports', label: 'Reports', icon: <AdminIcons.Reports /> }
-            ].map(item => {
+            ] as const).map(item => {
               const isActive = activeTab === item.id;
               return (
                 <button
                   key={item.id}
                   onClick={() => {
-                    setActiveTab(item.id as any);
+                    setActiveTab(item.id);
                     setSelectedCareerPath(null);
                   }}
                   style={{

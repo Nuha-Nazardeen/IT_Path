@@ -1,36 +1,44 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import heroBg from '../../assets/images/2.jpg';
 
 interface HeroSectionProps {
   onStartJourney?: () => void;
 }
 
-export function HeroSection({ onStartJourney }: HeroSectionProps) {
-  const [user, setUser] = useState<any>(null);
+interface StoredHeroUser {
+  fullName: string;
+  email?: string;
+  isAdmin?: boolean;
+  academic?: { degree: string };
+  career?: string;
+}
 
-  useEffect(() => {
-    const session = localStorage.getItem('itpath_logged_in_user');
-    if (session) {
-      try {
-        const parsedSession = JSON.parse(session);
-        if (parsedSession.email === 'admin@gmail.com') {
-          setUser({ fullName: 'Admin User', email: 'admin@gmail.com', isAdmin: true });
-          return;
-        }
-      } catch (e) {}
+function getStoredHeroUser(): StoredHeroUser | null {
+  const session = localStorage.getItem('itpath_logged_in_user');
+  if (!session) return null;
 
-      const stored = localStorage.getItem('itpath_registered_user');
-      if (stored) {
-        try {
-          setUser(JSON.parse(stored));
-        } catch (e) {
-          setUser({ fullName: 'Student', academic: { degree: 'IT Programme' }, career: 'Software Engineering' });
-        }
-      } else {
-        setUser({ fullName: 'Student', academic: { degree: 'IT Programme' }, career: 'Software Engineering' });
-      }
+  try {
+    const parsedSession = JSON.parse(session) as { email?: string };
+    if (parsedSession.email === 'admin@gmail.com') {
+      return { fullName: 'Admin User', email: 'admin@gmail.com', isAdmin: true };
     }
-  }, []);
+  } catch {
+    // Ignore malformed session JSON and fall back to registered user
+  }
+
+  const stored = localStorage.getItem('itpath_registered_user');
+  if (stored) {
+    try {
+      return JSON.parse(stored) as StoredHeroUser;
+    } catch {
+      return { fullName: 'Student', academic: { degree: 'IT Programme' }, career: 'Software Engineering' };
+    }
+  }
+  return { fullName: 'Student', academic: { degree: 'IT Programme' }, career: 'Software Engineering' };
+}
+
+export function HeroSection({ onStartJourney }: HeroSectionProps) {
+  const [user] = useState<StoredHeroUser | null>(() => getStoredHeroUser());
 
   const arrowRight = (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
