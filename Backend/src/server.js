@@ -6,6 +6,7 @@ import { connectDatabase } from "./config/database.js";
 import { configureSession } from "./config/session.js";
 import authRoutes from "./routes/authRoutes.js";
 import studentDataRoutes from "./routes/studentDataRoutes.js";
+import fileRoutes from "./routes/fileRoutes.js";
 
 dotenv.config();
 
@@ -44,6 +45,7 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/student", studentDataRoutes);
+app.use("/api/files", fileRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: "API route not found." });
@@ -51,7 +53,13 @@ app.use((req, res) => {
 
 app.use((error, req, res, next) => {
   console.error(error);
-  res.status(error.status || 500).json({
+  if (error.name === "ValidationError" || error.name === "CastError") {
+    return res.status(400).json({ message: error.message });
+  }
+  if (error.code === 11000) {
+    return res.status(409).json({ message: "A duplicate record already exists." });
+  }
+  return res.status(error.status || 500).json({
     message: error.message || "Internal server error.",
   });
 });
